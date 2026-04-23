@@ -1,7 +1,6 @@
 import streamlit as st
-import tensorflow as tf
+from keras.models import load_model
 import numpy as np
-import os
 from PIL import Image
 
 st.set_page_config(page_title="Plant AI", layout="centered")
@@ -64,12 +63,31 @@ h1 {
 st.markdown("<h1>🌿 Plant Disease Detection</h1>", unsafe_allow_html=True)
 st.write("### Upload a leaf image and let AI analyze it")
 
+# Load model (fixed)
 @st.cache_resource
-def load_model():
-    return tf.keras.models.load_model("plant_model.keras")
+def load_my_model():
+    return load_model("plant_model.keras")
 
-model = load_model()
-class_names = sorted(os.listdir("dataset"))
+model = load_my_model()
+
+# Hardcoded class names (IMPORTANT FIX)
+class_names = [
+    "Pepper bell Bacterial spot",
+    "Pepper bell healthy",
+    "Potato Early blight",
+    "Potato Late blight",
+    "Potato healthy",
+    "Tomato Bacterial spot",
+    "Tomato Early blight",
+    "Tomato Late blight",
+    "Tomato Leaf Mold",
+    "Tomato Septoria leaf spot",
+    "Tomato Spider mites",
+    "Tomato Target Spot",
+    "Tomato Yellow Leaf Curl Virus",
+    "Tomato mosaic virus",
+    "Tomato healthy"
+]
 
 uploaded_file = st.file_uploader("Upload Image", type=["jpg", "png", "jpeg"])
 
@@ -87,7 +105,7 @@ if uploaded_file:
         class_index = np.argmax(prediction)
         confidence = np.max(prediction)
 
-    result = class_names[class_index].replace("_", " ")
+    result = class_names[class_index]
 
     st.markdown(f"""
     <div class="result-card">
